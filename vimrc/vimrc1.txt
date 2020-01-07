@@ -1,0 +1,38 @@
+syntax on
+set number
+set shiftwidth=4
+set tabstop=4
+set scrolloff=3
+set hlsearch
+set confirm
+set cindent
+set cursorline
+set fileformat=unix
+highlight CursorLine cterm=NONE ctermbg=black ctermfg=green guibg=NONE guifg=NONE
+
+map <C-A> ggVG"+y
+map <F5> :call Run()<CR>
+func! Run()
+  exec "w"
+  if &filetype == "c"
+    exec "!g++ % -o %<"
+    exec "!./%<"
+  elseif &filetype == "cpp"
+    exec "!g++ % -o %<"
+    exec "!./%<"
+  elseif &filetype == "java"
+   	exec "!javac %"
+    exec "!java %<"
+  elseif &filetype == "sh"
+    :!bash %
+  elseif &filetype == "python"
+    exec "!python %"
+  elseif &filetype == "go"
+    exec "!go build %<"
+    exec "!go run %"
+  elseif &filetype == "mkd"
+    exec "!~/.vim/markdown.pl % > %.html &"
+    exec "!firefox %.html &"
+  endif
+endfunc
+
