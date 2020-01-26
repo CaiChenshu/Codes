@@ -1,0 +1,96 @@
+source $VIMRUNTIME/vimrc_example.vim
+
+set diffexpr=MyDiff()
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg1 = substitute(arg1, '!', '\!', 'g')
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg2 = substitute(arg2, '!', '\!', 'g')
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let arg3 = substitute(arg3, '!', '\!', 'g')
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      if empty(&shellxquote)
+        let l:shxq_sav = ''
+        set shellxquote&
+      endif
+      let cmd = '"' . $VIMRUNTIME . '\diff"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  let cmd = substitute(cmd, '!', '\!', 'g')
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+  if exists('l:shxq_sav')
+    let &shellxquote=l:shxq_sav
+  endif
+endfunction
+
+set encoding=utf-8
+set termencoding=utf-8
+set fileencoding=utf-8
+set fileencodings=ucs-bom,utf-8,chinese,cp936
+source $VIMRUNTIME/delmenu.vim
+source $VIMRUNTIME/menu.vim
+"vim提示信息乱码的解决
+language messages zh_CN.utf-8
+
+colorscheme Tomorrow-Night
+set guifont=Inconsolata:h10:cANSI
+
+syntax on
+set showcmd
+set nowrap
+set ruler
+set cursorline
+set hlsearch
+set number
+set shiftwidth=4
+set tabstop=4
+set scrolloff=3
+" 窗口大小
+set lines=35 columns=140
+" 分割出来的窗口位于当前窗口下边/右边
+set splitbelow
+set splitright
+"不显示工具/菜单栏
+"set guioptions-=T
+"set guioptions-=m
+"set guioptions-=L
+"set guioptions-=r
+"set guioptions-=b
+"使用内置tab样式
+"set guioptions-=e
+
+noremap <F11> <Esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleFullscreen', 0)<CR>
+" 按 F12 切换窗口透明度
+noremap <F12> <Esc>:call libcallnr('gvim_fullscreen.dll', 'ToggleTransparency', "247,180")<CR>
+" 隐藏菜单、工具栏、滚动条
+"set guioptions-=TrLm
+
+map<C-A> ggVG"+y
+map<F5>: call Run()<CR>
+func Run()
+  exec "w"
+  if &filetype == 'c'
+    exec "g++ % -o %<"
+    exec "./%<"
+  elseif &filetype == 'cpp'
+    exec "g++ % -o %<"
+    exec "./%<"
+  elseif &filetype == 'java'
+    exec "javac %"
+    exec "java %<"
+  elseif &filetype == 'python'
+    exec python %"
+  endif
+endfunc
+
